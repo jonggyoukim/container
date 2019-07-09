@@ -74,7 +74,7 @@ Node.JS로 만들어진 사용자를 관리하는 애플리케이션을 작성�
 
     웹브라우저로 `http://호스트IP:8000/`을 접속해 봅니다.
 
-    ![](https://github.com/shiftyou/cloudnative/blob/master/images/docker-app1.PNG)
+    ![](images/app1.png)
 
     표시되는 IP Address가 현재 VM의 IP Address를 나타내고 있습니다.
 
@@ -269,6 +269,6 @@ $ docker run --name app --network mynet -e MYSQL_SERVICE_HOST=mydb -p 8000:8000 
     이로써 애플리케이션을 도커이미지로 만들고, 컨테이너로 수행완료하였습니다.  
     웹브라우저로 `http://호스트IP:8000/`을 접속해 봅니다.
 
-    ![](https://github.com/shiftyou/cloudnative/blob/master/images/docker-app1.PNG)
+    ![](images/app2.png)
 
     표시되는 IP Address가 현재 VM의 IP Address를 나타내고 있습니다.
