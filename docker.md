@@ -461,7 +461,7 @@ CMD echo "hello world"
 다음은 다른 Dockerfile의 예제이다.
 
 ~~~dockerfile
-from node:8
+from node:alpine
 run mkdir -p /usr/src/app
 workdir /usr/src/app
 copy package*.json ./

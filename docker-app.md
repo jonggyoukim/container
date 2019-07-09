@@ -6,6 +6,12 @@ Node.JS로 만들어진 사용자를 관리하는 애플리케이션을 작성�
 
 애플리케이션의 소스는 미리 만들어진 것을 가져와서 사용하고, MySQL은 미리 만들어진 도커 이미지를 사용합니다.
 
+1. git 클라이언트를 설치합니다.
+
+    ~~~
+    $ sudo yum install -y git
+    ~~~
+
 1. git 에서 기존에 만들어진 애플리케이션 소스를 가져옵니다.
 
     ~~~
@@ -28,8 +34,14 @@ Node.JS로 만들어진 사용자를 관리하는 애플리케이션을 작성�
 1. 애플리케이션용 테이블 만들기
 
     ~~~sh
-    $ docker exec -it mydb mysql -u root -pmypassword < ./create.sql
+    $ cat create.sql | docker exec -i mydb mysql -u root -pmypassword
     #exit
+    ~~~
+
+1. npm 설치
+
+    ~~~
+    $ sudo yum -y install npm
     ~~~
 
 1. 애플리케이션 실행하기
@@ -39,10 +51,31 @@ Node.JS로 만들어진 사용자를 관리하는 애플리케이션을 작성�
     $ npm start
     ~~~
 
+1. **compute instance로 수행**하였다면 외부에서 접근하기 위하여 firewall 을 수정한다.
+
+   ~~~
+   $ sudo firewall-cmd --add-port=8000/tcp --permanent
+   $ sudo systemctl restart firewalld
+   ~~~
+
+1. **compute instance로 수행**하였다면 해당 포트에 대한 Security List 도 등록한다.
+
+    ![](./images/security1.png)
+
+    ![](./images/security2.png)
+
+    ![](./images/security3.png)
+
+    ![](./images/security4.png)
+
+    ![](./images/security5.png)
+
 1. 테스트 하기
 
-    웹브라우저로 `http://localhost:8000/`을 접속해 봅니다.
+    웹브라우저로 `http://호스트IP:8000/`을 접속해 봅니다.
+
     ![](https://github.com/shiftyou/cloudnative/blob/master/images/docker-app1.PNG)
+
     표시되는 IP Address가 현재 VM의 IP Address를 나타내고 있습니다.
 
 1. 마치기
@@ -60,7 +93,7 @@ Node.JS로 만들어진 사용자를 관리하는 애플리케이션을 작성�
     이 파일은 도커 이미지를 만들기 위한 설정파일입니다.
     ~~~docker
     # Node 버젼 8의 이미지를 기본으로 합니다.
-    FROM node:8
+    FROM node:alpine
 
     # 애플리케이션이 위치할 디렉토리를 생성합니다.
     WORKDIR /user/src/app
