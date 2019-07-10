@@ -6,8 +6,52 @@
 
 또한 도커 레지스트리로 OCIR (Oracle Cloud Infrastruccture Registry)를 제공하여 도커 이미지를 프라이빗으로 저장할 수 있습니다.
 
-# OCIR에 컨테이너 로그인
+# httpd OKE에서 수행하기
 
+1. myhttpd 라는 애플리케이션 이름으로 배포한다.
+    ~~~
+    $ kubectl run myhttpd --image=httpd
+    kubectl run --generator=deployment/apps.v1beta1 is DEPRECATED and will be removed in a future version. Use kubectl create instead.
+    deployment.apps/myhttpd created
+    ~~~
+
+1. 잘 수행되었는지 살펴본다.
+    ~~~
+    $ kubectl get deployment
+    NAME                                               DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+    hello                                              1         1         1            1           6h55m
+    myhttpd                                            1         1         1            1           18s
+
+    $ kubectl get service
+    NAME                                               TYPE           CLUSTER-IP      EXTERNAL-IP       PORT(S)          AGE
+    hello                                              LoadBalancer   10.96.70.35     129.213.141.145   8000:31291/TCP   6h43m
+    kubernetes                                         ClusterIP      10.96.0.1       <none>            443/TCP          53d
+    ~~~
+
+1. myhttpd를 위한 service를 생성한다.
+    ~~~
+    $ kubectl expose deployment myhttpd --type=LoadBalancer --port=80
+    service/myhttpd exposed
+    ~~~
+
+1. service를 살펴본다.
+    ~~~
+    $ kubectl get service
+    NAME                                               TYPE           CLUSTER-IP      EXTERNAL-IP       PORT(S)          AGE
+    hello                                              LoadBalancer   10.96.70.35     129.213.141.145   8000:31291/TCP   6h46m
+    kubernetes                                         ClusterIP      10.96.0.1       <none>            443/TCP          53d
+    myhttpd                                            LoadBalancer   10.96.199.17    129.213.190.27    80:31713/TCP     54s
+    ~~~
+
+1. 적혀진 EXTERNAL-IP로 접속해 본다.
+    ~~~
+    $ curl 129.213.190.27
+    <html><body><h1>It works!</h1></body></html>
+    ~~~ 
+
+
+
+# OCIR에 컨테이너 로그인
 
 1. OCIR 살펴 보기
 
@@ -36,9 +80,9 @@
 
 # hello 이미지 만들어서 레지스트리에 올리기
 
-
+hello 디렉토리를 만들고 node.js 로 동작하는 샘플을 만들어 보도록 합니다. 
 <details>
-<summary>hello 디렉토리를 만들고 node.js 로 동작하는 샘플을 만들어 보도록 합니다. 기존에 만들었다면 다음으로 넘어갑니다.</summary>
+<summary><-- 삼각형을 클릭하여 열어주세요. 기존에 만들었다면 다음으로 넘어갑니다.</summary>
 <div markdown="1">
 
 ~~~
@@ -110,17 +154,17 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
     ~~~
 
 1. 실행하기
-~~~
-kubectl run --image=iad.ocir.io/apackrsct01/jonggyoukim/hello hello
-kubectl get deployment/hello -o yaml > ./hello.yaml
-add
-      imagePullSecrets:
-      - name: ocirsecret
-kubectl apply -f hello.yaml
-kubectl expose deployment hello --type=LoadBalancer --port=80
-kubectl get service
-kubectl delete service hello
-~~~
+    ~~~
+    kubectl run --image=iad.ocir.io/apackrsct01/jonggyoukim/hello hello
+    kubectl get deployment/hello -o yaml > ./hello.yaml
+    add
+        imagePullSecrets:
+        - name: ocirsecret
+    kubectl apply -f hello.yaml
+    kubectl expose deployment hello --type=LoadBalancer --port=80
+    kubectl get service
+    kubectl delete service hello
+    ~~~
 
 
 # 두개 이상의 연결된 서비스 배포 

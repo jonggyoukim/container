@@ -3,7 +3,7 @@
 접속된 터미널로 다음의 명령어를 입력해 봅니다.
 ~~~
 $ sudo docker version
-$ sudo docker https://github.com/shiftyou/cloudnative/blob/master/images
+$ sudo docker images
 $ sudo docker ps -a
 ~~~
 
@@ -41,14 +41,14 @@ $ docker search mysql
 NAME                                                   DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED
 mysql                                                  MySQL is a widely used, open-source relation…   8123                [OK]                
 mariadb                                                MariaDB is a community-developed fork of MyS…   2761                [OK]                
-mysql/mysql-server                                     Optimized MySQL Server Docker https://github.com/shiftyou/cloudnative/blob/master/images. Create…   607                                     [OK]
+mysql/mysql-server                                     Optimized MySQL Server Docker images. Create…   607                                     [OK]
 zabbix/zabbix-server-mysql                             Zabbix Server with MySQL database support       192                                     [OK]
 hypriot/rpi-mysql                                      RPi-compatible Docker Image with Mysql          113                                     
 zabbix/zabbix-web-nginx-mysql                          Zabbix frontend based on Nginx web-server wi…   101                                     [OK]
 centurylink/mysql                                      Image containing mysql. Optimized to be link…   60                                      [OK]
 centos/mysql-57-centos7                                MySQL 5.7 SQL database server                   52                                      
 1and1internet/ubuntu-16-nginx-php-phpmyadmin-mysql-5   ubuntu-16-nginx-php-phpmyadmin-mysql-5          50                                      [OK]
-mysql/mysql-cluster                                    Experimental MySQL Cluster Docker https://github.com/shiftyou/cloudnative/blob/master/images. Cr…   44                                      
+mysql/mysql-cluster                                    Experimental MySQL Cluster Docker images. Cr…   44                                      
 tutum/mysql                                            Base docker image to run a MySQL database se…   31                                      
 zabbix/zabbix-web-apache-mysql                         Zabbix frontend based on Apache web-server w…   29                                      [OK]
 schickling/mysql-backup-s3                             Backup MySQL to S3 (supports periodic backup…   26                                      [OK]
@@ -68,7 +68,7 @@ widdpim/mysql-client                                   Dockerized MySQL Client (
 
 웹브라우저에서 검색하면 다음과 같이 결과가 나온다.
 
-![](https://github.com/shiftyou/cloudnative/blob/master/images/docker4.png)
+![](https://github.com/shiftyou/cloudnative/blob/master/images/docker4.png?raw=true?raw=true)
 
 
 # docker run
@@ -100,7 +100,7 @@ To generate this message, Docker took the following steps:
 To try something more ambitious, you can run an Ubuntu container with:
  $ docker run -it ubuntu bash
 
-Share https://github.com/shiftyou/cloudnative/blob/master/images, automate workflows, and more with a free Docker ID:
+Share images, automate workflows, and more with a free Docker ID:
  https://hub.docker.com/
 
 For more examples and ideas, visit:
@@ -136,7 +136,7 @@ hello-world 와 마찬가지로 이미지를 pulling 한다.
 
 httpd 이미지를 사용하는 방법에 내용은 다음과 같이 되어있다.  
 
-![](https://github.com/shiftyou/cloudnative/blob/master/images/docker5.png)
+![](https://github.com/shiftyou/cloudnative/blob/master/images/docker5.png?raw=true)
 
 httpd의 기본 포트는 80 이다.  
 80 포트로 httpd가 서비스를 하고 있지만, 컨테이너 내에서 80으로 서비스가 되고 있어 접근이 불가능하다.  
@@ -145,7 +145,7 @@ httpd의 기본 포트는 80 이다.
 Dockerfile을 사용하지 않고 수행하려면 다음과 같이 해야 한다고 되어있다.
 
 ~~~
-$ docker run -dit --name my-apache-app -p 8080:80 -v "$PWD":/usr/local/apache2/htdocs/ httpd:2.4
+$ docker run -dit --name my-apache-app -p 8000:80 -v "$PWD":/usr/local/apache2/htdocs/ httpd:2.4
 ~~~
 
 몇가지 옵션이 사용되었는데 옵션에 docker run 명령어의 옵션을 보려면 다음과 같이 명령한다.
@@ -173,11 +173,8 @@ Options:
 - -v : 볼륨 마운트
 
 그래서 다음과 같이 httpd 를 수행한다.
-
->8080 포트는 jenkins이 사용하고 있어 9090으로 변경
-
 ~~~
-$ docker run -d --name myhttpd -p 9090:80 -v $PWD:/usr/local/apache2/htdocs/ httpd
+$ docker run --name myhttpd -p 9090:80 httpd
 
 AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 172.17.0.2. Set the 'ServerName' directive globally to suppress this message
 AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 172.17.0.2. Set the 'ServerName' directive globally to suppress this message
@@ -185,21 +182,11 @@ AH00558: httpd: Could not reliably determine the server's fully qualified domain
 [Sat May 11 09:22:25.513356 2019] [core:notice] [pid 1:tid 140131185029184] AH00094: Command line: 'httpd -D FOREGROUND'
 ~~~
 
-웹브라우저를 통해 localhost:9090 을 접속해 보면 다음과 같이 나타난다.
->VM에서 수행한다.
-
-![](https://github.com/shiftyou/cloudnative/blob/master/images/docker6.png)
-
--v 옵션으로 httpd가 바라보는 root 가 호스트 컴퓨터의 현재 디렉토리이다. 화면에는 현재 디렉토리의 리스트들이 보여지는데, 이는 index 파일이 없어서 보이는 것이다.  index 파일을 만들도록 한다.
-
-다음과 같이 수행한다.
+터미널을 하나 더 열어 curl을 통해서 접속해 본다.
 ~~~
-echo 'Welcome docker httpd' > index.html
+$ curl localhost:9090
+<html><body><h1>It works!</h1></body></html>
 ~~~
-
-웹브라우저에서 reload를 하면 다음과 같이 index.html 의 내용이 보일 것이다.
-
-![](https://github.com/shiftyou/cloudnative/blob/master/images/docker7.png)
 
 # docker ps
 
@@ -360,7 +347,7 @@ mysql을 컨테이너로 시작하고, sql을 수행하기 위해서 다음과 �
 
 mysql은 docker.com에서 살펴보면 다음과 같다.
 
-![](https://github.com/shiftyou/cloudnative/blob/master/images/docker8.png)
+![](https://github.com/shiftyou/cloudnative/blob/master/images/docker8.png?raw=true)
 
 mysql 컨테이너의 실행은 다음과 같이 한다.
 ~~~
@@ -512,7 +499,7 @@ Successfully tagged hello:latest
 
 실제로 잘 만들어졌는지 docker image로 살펴본다.
 ~~~
-$ docker https://github.com/shiftyou/cloudnative/blob/master/images hello
+$ docker images hello
 REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE
 hello               latest              d9bb3b6b58bf        About a minute ago   1.2MB
 ~~~
@@ -560,13 +547,13 @@ docker를 사용하기 위해서는 docker image registry에서 docker image를 
 
     웹브라우저로 hub.docker.com 에 접속을 한다. hub.docker.com 은 docker 사에서 제공하는 public docker image registry이다.
 
-    ![](https://github.com/shiftyou/cloudnative/blob/master/images/docker1.png)
+    ![](https://github.com/shiftyou/cloudnative/blob/master/images/docker1.png?raw=true)
 
     "sign up for Docker Hub"를 선택하여 계정을 만든다.
 
     등록한 email을 통하여 인증을 하면 다음과 같이 로그인된다.
 
-    ![](https://github.com/shiftyou/cloudnative/blob/master/images/docker2.png)
+    ![](https://github.com/shiftyou/cloudnative/blob/master/images/docker2.png?raw=true)
 
     이제 자신만의 docker image registry가 생겼다.
 
@@ -576,7 +563,7 @@ docker를 사용하기 위해서는 docker image registry에서 docker image를 
 ~~~
 $ docker login
 
-Login with your Docker ID to push and pull https://github.com/shiftyou/cloudnative/blob/master/images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
 Username: <username. not email>
 Password: <password>
 WARNING! Your password will be stored unencrypted in /home/user1/.docker/config.json.
