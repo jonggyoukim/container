@@ -8,7 +8,9 @@
 
 # httpd OKE에서 수행하기
 
-1. myhttpd 라는 애플리케이션 이름으로 배포한다.
+OKE에서 docker hub에 있는 이미지들 컨테이너화 해 보도록 한다.
+
+1. myhttpd 라는 애플리케이션 이름으로 컨테이너화 한다.
     ~~~
     $ kubectl run myhttpd --image=httpd
     kubectl run --generator=deployment/apps.v1beta1 is DEPRECATED and will be removed in a future version. Use kubectl create instead.
@@ -49,6 +51,8 @@
     <html><body><h1>It works!</h1></body></html>
     ~~~ 
 
+이와같이 docker hub에 있는 image들을 가져다 쓸 때에는 쉽게 가져다 쓴다.  
+하지만 OCIR에 있는 이미지들은 private 한 영역이기 때문에 인증과정을 거쳐야 OKE에서 사용할 수 있다.
 
 
 # OCIR에 컨테이너 로그인
