@@ -459,12 +459,6 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
 
     ![](./images/kube4.PNG)
 
-1. 예제 동영상
-
-    필요하면 동영상으로 예제를 보시면 됩니다.
-
-    [![OKE](http://img.youtube.com/vi/kn7bpT-LmJo/0.jpg)](https://www.youtube.com/watch?v=kn7bpT-LmJo "OKE")
-
 
 # 스케일 아웃
 
@@ -526,9 +520,3 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
     ~~~
 
     로드밸런서의 외부IP인 http://129.213.71.28:8080 로 접속을 여러번 해 보면, 애플리케이션에서 나타내는 로컬 IP가 3개의 서버 IP를 랜덤으로 나타납니다.
-
-1. 예제 동영상
-
-    필요하면 동영상으로 예제를 보시면 됩니다.
-    
-    [![Scaleout](http://img.youtube.com/vi/QZ8YmIASv7M/0.jpg)](https://www.youtube.com/watch?v=QZ8YmIASv7M "Scaleout")
