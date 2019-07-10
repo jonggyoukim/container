@@ -6,18 +6,8 @@
 
 또한 도커 레지스트리로 OCIR (Oracle Cloud Infrastruccture Registry)를 제공하여 도커 이미지를 프라이빗으로 저장할 수 있습니다.
 
-# OCIR에 컨테이너 이미지 등록
+# OCIR에 컨테이너 로그인
 
-1. Docker Hub 살펴보기
-
-    도커 레지스트리는 기본적으로 https://hub.docker.com 을 사용합니다. 
-
-    해당 URL의 아이디가 존재하면 다음과 같이 도커 이미지들이 보여집니다.
-    ![](./images/kube2.PNG)
-
-    이 저장소는 퍼블릭 레지스트리로 누구든지 자신의 도커이미지를 가져다가 사용할 수 있습니다.
-
-    비공개로 레지스트리를 사용하고자 하면 프라이빗 도커 레지스트리를 사용합니다. 오라클 클라우드에서 제공하는 OCIR는 비공개 레지스트리입니다.
 
 1. OCIR 살펴 보기
 
@@ -25,29 +15,13 @@
     ![](./images/kube1.PNG)
     현재 아무런 도커 이미지가 없어 비어있는 상태입니다.
 
-1. Docker 로그인
 
-    도커 레지스트리에 도커 이미지를 푸시하기 위해서는 우선 로그인을 해야 합니다.
-    
-    공개 레지스트리인 http://hub.docker.com 에 로긴을 하기 위해서는 다음과 같이 합니다.
-    ~~~
-    $ docker login
-
-    Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
-    Username: <아이디>
-    Password: <패스워드>
-    WARNING! Your password will be stored unencrypted in /home/user1/.docker/config.json.
-    Configure a credential helper to remove this warning. See
-    https://docs.docker.com/engine/reference/commandline/login/#credentials-store
-
-    Login Succeeded
-    ~~~
-
+1. OCIR 로그인 
 
     비공개 레지스트리인 OCIR에 로긴을 하기 위해서는 다음과 같이 로그인 합니다.
 
     ~~~
-    $ docker login -u busanbnk/jonggyou.kim@oracle.com iad.ocir.io
+    $ docker login -u apackrsct01/<login id> iad.ocir.io
 
     Password:
     WARNING! Your password will be stored unencrypted in /home/user1/.docker/config.json.
@@ -59,31 +33,103 @@
 
     비공개이기 때문에 아이디와 레지스트리 주소를 로그인 시 지정해주어야 합니다.
     
-1. MySQL 이미지 태그 설정
 
-    이미지를 OCIR에 넣기 위해서는 태그를 설정해야 합니다.
+# hello 이미지 만들어서 레지스트리에 올리기
+
+
+<details>
+<summary>hello 디렉토리를 만들고 node.js 로 동작하는 샘플을 만들어 보도록 합니다. 기존에 만들었다면 다음으로 넘어갑니다.</summary>
+<div markdown="1">
+
+~~~
+$ mkdir hello
+$ cd hello
+~~~
+
+server.js
+~~~
+var http = require('http');
+var os = require('os');
+
+var handleRequest = function(request, response) {
+  console.log('Received request for URL: ' + request.url);
+  response.writeHead(200);
+  response.end('Hello World!' + os.hostname());
+};
+var www = http.createServer(handleRequest);
+www.listen(8000);
+console.log(os.hostname() + " Server listening..");
+~~~
+
+Dockerfile
+~~~
+FROM node:slim
+EXPOSE 8000
+COPY server.js .
+CMD node server.js
+~~~
+
+hello 이미지를 만든다. (개인의 docker hub 아이디를 쓴다.)
+~~~
+$ docker build -t {docker.com username}/hello .
+
+or
+
+$ docker build -t {docker.com username}/hello -f Dockerfile .
+~~~
+
+</div>
+</details>
+
+태그를 수정합니다.
+~~~
+$ docker tag hello iad.ocir.io/apackrsct01/hello
+~~~
+
+레지스트리 등록한다. (push가 되지 않으면 로그인을 먼저 한다)
+~~~
+$ docker push iad.ocir.io/apackrsct01/sample-app
+~~~
+
+# hello 서비스 시작하기
+1. secret 만들기
+
+    쿠버네티스에서 도커 레지스트리에 접속하기 위해서 접속정보를 저장해야 합니다.
+    ~~~sh
+    # 예제
+    $ kubectl create secret docker-registry ocirsecret --docker-server=iad.ocir.io --docker-username='apackrsct01/jonggyou.kim@oracle.com' --docker-password='3_o}SPqt)V{5k8pa3czw'
     ~~~
-    $ docker tag mysql:5.7 iad.ocir.io/busanbnk/mysql
+    로긴이 완료되면 다음과 같이 확인 가능합니다.
+    ~~~sh
+    # SECRET 보기
+    $ kubectl get secret
+
+    NAME                  TYPE                                  DATA   AGE
+    default-token-qcnl4   kubernetes.io/service-account-token   3      2d
+    ocirsecret            kubernetes.io/dockerconfigjson        1      24m
     ~~~
 
-    도커 이미지를 살펴보면 다음과 같습니다.
-    ~~~
-    $ docker images
+1. 실행하기
+~~~
+kubectl run --image=iad.ocir.io/apackrsct01/jonggyoukim/hello hello
+kubectl get deployment/hello -o yaml > ./hello.yaml
+add
+      imagePullSecrets:
+      - name: ocirsecret
+kubectl apply -f hello.yaml
+kubectl expose deployment hello --type=LoadBalancer --port=80
+kubectl get service
+kubectl delete service hello
+~~~
 
-    REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
-    user1-sample-app             latest              7f88f43f85c9        About an hour ago   904MB
-    user1/node-web-app           latest              19353c1ef997        6 hours ago         896MB
-    mysql                        5.7                 e47e309f72c8        2 weeks ago         372MB
-    iad.ocir.io/busanbnk/mysql   latest              e47e309f72c8        2 weeks ago         372MB
-    node                         8                   4f01e5319662        2 weeks ago         893MB
-    ~~~
-    iad.ocir.io/busanbnk/mysql 이 리스트에 존재합니다.
-    
+
+# 두개 이상의 연결된 서비스 배포 
+
 1. App 이미지 태그 설정
 
     역시 애플리케이션 이미지를 OCIR에 넣기 위해서는 태그를 설정해야 합니다.
     ~~~
-    $ docker tag ${USER}-sample-app iad.ocir.io/busanbnk/${USER}-sample-app
+    $ docker tag sample-app iad.ocir.io/apackrsct01/sample-app
     ~~~
 
     도커 이미지를 살펴보면 다음과 같습니다.
@@ -91,43 +137,23 @@
     $ docker images
 
     REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
-    user1-sample-app                        latest              7f88f43f85c9        About an hour ago   904MB
-    iad.ocir.io/busanbnk/user1-sample-app   latest              7f88f43f85c9        About an hour ago   904MB
+    sample-app                              latest              7f88f43f85c9        About an hour ago   904MB
+    iad.ocir.io/apackrsct01/sample-app      latest              7f88f43f85c9        About an hour ago   904MB
     user1/node-web-app                      latest              19353c1ef997        6 hours ago         896MB
     mysql                                   5.7                 e47e309f72c8        2 weeks ago         372MB
-    iad.ocir.io/busanbnk/mysql              latest              e47e309f72c8        2 weeks ago         372MB
     node                                    8                   4f01e5319662        2 weeks ago         893MB
     ~~~
-    iad.ocir.io/busanbnk/user1-sample-app 이 존재합니다.
+    iad.ocir.io/apackrsct01/sample-app 이 존재합니다.
 
 1. OCIR에 이미지 등록
 
     docker push 명령어로 도커 이미지를 도커 레지스트리에 저장합니다.
 
-    MySQL을 레지스트리에 등록합니다.
+    애플리케이션을 레지스트리에 등록합니다.
     ~~~
-    $ docker push iad.ocir.io/busanbnk/mysql
+    $ docker push iad.ocir.io/apackrsct01/sample-app
 
-    The push refers to repository [iad.ocir.io/busanbnk/mysql]
-    2d99d47e32ff: Pushed
-    b274c4ccaeb7: Pushed
-    3a6f6ce9f7a9: Pushed
-    16347e23e92e: Pushed
-    5d6846033b0c: Pushed
-    73ea790d3afa: Pushed
-    7d390c8db6fd: Pushed
-    7756685f09e9: Pushed
-    7412b239e6a1: Pushed
-    3d33930b279a: Pushed
-    0a07e81f5da3: Pushed
-    latest: digest: sha256:888d433748dbccc8388a665134b1906f13f599753ef190546903181b7312027d size: 2621
-    ~~~
-
-    그리고 애플리케이션을 레지스트리에 등록합니다.
-    ~~~
-    $ docker push iad.ocir.io/busanbnk/${USER}-sample-app
-
-    The push refers to repository [iad.ocir.io/busanbnk/user1-sample-app]
+    The push refers to repository [iad.ocir.io/apackrsct01/sample-app]
     1e3e8a895da2: Pushed
     2501822996fb: Pushed
     399ef710ae23: Pushed
@@ -153,22 +179,6 @@
 
 # OKE에 애플리케이션 컨테이너 배포
 
-1. secret 만들기
-
-    쿠버네티스에서 도커 레지스트리에 접속하기 위해서 접속정보를 저장해야 합니다.
-    ~~~sh
-    # 예제
-    $ kubectl create secret docker-registry ocirsecret --docker-server=iad.ocir.io --docker-username='busanbnk/jonggyou.kim@oracle.com' --docker-password='3_o}SPqt)V{5k8pa3czw'
-    ~~~
-    로긴이 완료되면 다음과 같이 확인 가능합니다.
-    ~~~sh
-    # SECRET 보기
-    $ kubectl get secret
-
-    NAME                  TYPE                                  DATA   AGE
-    default-token-qcnl4   kubernetes.io/service-account-token   3      2d
-    ocirsecret            kubernetes.io/dockerconfigjson        1      24m
-    ~~~
 
 1. PersistentVolume 만들기
 
@@ -247,7 +257,7 @@
             app: mysql
         spec:
         containers:
-        - image: iad.ocir.io/busanbnk/mysql
+        - image: mysql:5.7
             name: mysql
             env:
             - name: MYSQL_ROOT_PASSWORD
@@ -347,7 +357,7 @@
             tier: frontend
         spec:
         containers:
-        - image: iad.ocir.io/busanbnk/user1-sample-app
+        - image: iad.ocir.io/apackrsct01/sample-app
             name: oke-sample
             env:
             - name: MYSQL_SERVICE_HOST
@@ -445,7 +455,7 @@
 
     현재 배포상태를 살펴보면 3개로 바뀐것을 알 수 있습니다.
     ~~~
-    [user1@busanbank oke]$ kubectl get deployments
+    [user1@apackrsct01bank oke]$ kubectl get deployments
     NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
     mysql        1         1         1            1           35m
     oke-sample   3         3         3            3           26m
@@ -453,7 +463,7 @@
 
     현재 POD을 보면 전체 3개가 동작됨을 알 수 있습니다.
     ~~~
-    [user1@busanbank oke]$ kubectl get pods
+    [user1@apackrsct01bank oke]$ kubectl get pods
     NAME                          READY   STATUS    RESTARTS   AGE
     mysql-765686d4dc-vmssq        1/1     Running   0          35m
     oke-sample-5957f86d8f-4qv9l   1/1     Running   0          26m
