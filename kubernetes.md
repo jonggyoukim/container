@@ -382,7 +382,9 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
 
 1. App 배포
 
+
     애플리케이션 배포를 위한 app-deployment.yaml 입니다.
+
 
     ~~~yaml
     apiVersion: v1
