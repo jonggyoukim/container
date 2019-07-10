@@ -284,6 +284,7 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
 1. MySQL 배포
 
     MySQL 배포를 위한 mysql-deployment.yaml 입니다.
+    
     ~~~yaml
     apiVersion: v1
     kind: Service
@@ -334,7 +335,9 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
             persistentVolumeClaim:
               claimName: mysql-pv-claim 
     ~~~
+    
     실행은 다음과 같이 합니다.
+    
     ~~~
     $ kubectl create -f mysql-deployment.yaml
     ~~~
