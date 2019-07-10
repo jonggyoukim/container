@@ -158,9 +158,20 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
     ~~~
 
 1. 실행하기
+
+    다음과 같이 실행을 합니다.
     ~~~
     kubectl run --image=iad.ocir.io/apackrsct01/jonggyoukim/hello hello
+    ~~~
+
+    이렇게 하면 제대로 실행이 되지 않습니다. 왜냐하면 ocir 에 접근이 불가하기 때문입니다.  
+    이를 해결하기 위해 yaml 파일을 받습니다.
+    ~~~
     kubectl get deployment/hello -o yaml > ./hello.yaml
+    ~~~
+    그리고 아래와 같이 다음 부분을 추가합니다.
+    ~~~
+
     add
         imagePullSecrets:
         - name: ocirsecret
