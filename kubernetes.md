@@ -381,7 +381,9 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
     이로서 MySQL에 대한 설정이 완료하였습니다.
 
 1. App 배포
+
     애플리케이션 배포를 위한 app-deployment.yaml 입니다.
+
     ~~~yaml
     apiVersion: v1
     kind: Service
@@ -435,7 +437,9 @@ $ docker push iad.ocir.io/apackrsct01/sample-app
         imagePullSecrets:
         - name: ocirsecret 
     ~~~
+    
     실행은 다음과 같이 합니다.
+    
     ~~~
     $ kubectl create -f app-deployment.yaml
     ~~~
