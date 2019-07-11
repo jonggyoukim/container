@@ -230,38 +230,38 @@ Node.JS로 만들어진 사용자를 관리하는 애플리케이션을 작성�
 1. 컨테이너 연결 시키기
 
     컨테이너를 연결하기 위하여 network 를 만듭니다.
-~~~
-$ docker network create mynet
-~~~
+    ~~~
+    $ docker network create mynet
+    ~~~
 
-이 네트워크를 다른 컨테이너를 참여시켜야 합니다.  
-먼저 mysql을 정지하고 참여시킵니다.
-~~~
-# mysql을 정지합니다.
-$ docker stop mydb
+    이 네트워크를 다른 컨테이너를 참여시켜야 합니다.  
+    먼저 mysql을 정지하고 참여시킵니다.
+    ~~~
+    # mysql을 정지합니다.
+    $ docker stop mydb
 
-# mysql 컨테이너를 삭제합니다. (데이터가 사라집니다.)
-$ docker rm mydb
+    # mysql 컨테이너를 삭제합니다. (데이터가 사라집니다.)
+    $ docker rm mydb
 
-# mynet 네트워크를 포함하여 실행합니다.
-$ docker run --name mydb --network mynet -e MYSQL_ROOT_PASSWORD=mypassword -p 3306:3306 -d mysql:5.7 
+    # mynet 네트워크를 포함하여 실행합니다.
+    $ docker run --name mydb --network mynet -e MYSQL_ROOT_PASSWORD=mypassword -p 3306:3306 -d mysql:5.7 
 
-# 다시 테이블을 만듭니다.
-$ cat create.sql | docker exec -i mydb mysql -u root -pmypassword
-~~~
+    # 다시 테이블을 만듭니다.
+    $ cat create.sql | docker exec -i mydb mysql -u root -pmypassword
+    ~~~
 
-다음으로 app을 정지하고 참여시킵니다.
-~~~
-# app을 정지합니다.
-$ docker stop app
+    다음으로 app을 정지하고 참여시킵니다.
+    ~~~
+    # app을 정지합니다.
+    $ docker stop app
 
-# app 컨테이너를 삭제합니다. (데이터가 사라집니다.)
-$ docker rm app
+    # app 컨테이너를 삭제합니다. (데이터가 사라집니다.)
+    $ docker rm app
 
-# app 네트워크를 포함하여 실행합니다.
-$ docker run --name app --network mynet -e MYSQL_SERVICE_HOST=mydb -p 8000:8000 -it sample-app
+    # app 네트워크를 포함하여 실행합니다.
+    $ docker run --name app --network mynet -e MYSQL_SERVICE_HOST=mydb -p 8000:8000 -it sample-app
 
-~~~
+    ~~~
 
 
 1. 완료
