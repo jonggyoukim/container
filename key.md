@@ -27,7 +27,7 @@
 이렇게 public/private key 쌍을 준비해 놓고 다음 진행을 합니다.  
 위의 과정으로 만들어진 key  값들은 다음과 같습니다.
 - [publickey.pub](./files/publickey.pub)
-- [privatekey.ppk](./files/privatekey.pub)
+- [privatekey.ppk](./files/privatekey.ppk)
 
 이미 만들어진 key를 다운로드 하여 사용하도록 합니다.
 
