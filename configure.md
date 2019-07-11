@@ -33,7 +33,7 @@
 
 1. docker를 설치합니다.
     ~~~
-    sudo yum install -y docker-eingine
+    sudo yum install -y docker-engine
     ~~~
 
 1. docker를 시작합니다.
