@@ -1,7 +1,7 @@
 # docker 테스트
 
 접속된 터미널로 다음의 명령어를 입력해 봅니다.
-~~~
+~~~sh
 $ sudo docker version
 $ sudo docker images
 $ sudo docker ps -a
